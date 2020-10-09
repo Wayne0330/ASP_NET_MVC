@@ -156,6 +156,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ProtalDBService.cs" />
+    <Compile Include="ViewModels\MemberRegisterView.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config" />
