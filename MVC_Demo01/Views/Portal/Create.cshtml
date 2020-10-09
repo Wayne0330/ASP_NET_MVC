@@ -1,0 +1,25 @@
+﻿@model IEnumerable<Job_Demo.Models.Account>
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>加入會員</h2>
+
+@using (Html.BeginForm("Create", "Portal"))
+{
+<div>
+    @Html.Label("姓名");
+    @Html.TextBox("UserName");
+    <br />
+    @Html.Label("信箱");
+    @Html.TextBox("Email");
+    <br />
+    @Html.Label("密碼");
+    @Html.TextBox("Password");
+    <br />
+    @Html.Label("會員等級");
+    @Html.TextBox("Identity");
+    <br/>
+    <input type="submit" value="送出"/>
+</div>
+}
