@@ -3,8 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web;
 using System.Web.Configuration;
+using System.Web.ModelBinding;
 
 namespace Job_Demo.Services
 {
@@ -16,16 +19,38 @@ namespace Job_Demo.Services
             return (db.Account.ToList());
         }
 
-        public void DBCreate(string Username, string Password, string Email, string Identity) {
-            Account AccountData = new Account();
-            AccountData.UserName = Username;
-            AccountData.Password = Password;
-            AccountData.Email = Email;
-            AccountData.Identity = Identity;
-            AccountData.Time = DateTime.Now;
-            db.Account.Add(AccountData);
+        public void Register(Account NewMember){
+            //Account AccountData = new Account();
+            //AccountData.UserName = Username;
+            //AccountData.Password = Password;
+            //AccountData.Email = Email;
+            //AccountData.Identity = Identity;
+            //NewMember.Password = HashPassword(NewMember.Password);
+            //NewMember.Time = DateTime.Now;
+            NewMember.Password = HashPassword(NewMember.Password);
+            db.Account.Add(NewMember);
             db.SaveChanges();
         }
+
+
+        //Hash密碼
+        public string HashPassword(string Password) {
+            string saltkey = "adfads2e13DCSDF213";
+            string saltAndPassword = String.Concat(Password, saltkey);
+            SHA1CryptoServiceProvider sha1Hasher = new SHA1CryptoServiceProvider();
+            byte[] PasswordData = Encoding.Default.GetBytes(saltAndPassword);
+            byte[] HashDate = sha1Hasher.ComputeHash(PasswordData);
+
+            string Hashresult = "";
+            for (int i = 0; i < HashDate.Length; i++)
+            {
+                Hashresult += HashDate[i].ToString("x2");
+            }
+
+            return Hashresult;
+        }
+
+
 
         public void AccountLogin(string Password, string Email)
         {
@@ -44,10 +69,10 @@ namespace Job_Demo.Services
 
         //信箱驗證
         #region 信箱驗證
-        public string EmailValidate(string UserName, string AuthCode)
+        public string EmailValidate(string Id, string UserName, string AuthCode)
         {
             //取得會員資料
-            Account ValidateAccount = db.Account.Find(UserName);
+            Account ValidateAccount = db.Account.Find(Id);
             string ValidateStr = string.Empty;
             if (ValidateAccount != null)
             {

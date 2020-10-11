@@ -19,7 +19,6 @@ namespace Job_Demo.Models
         public string UserName { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
-        public System.DateTime Time { get; set; }
         public string AuthCode { get; set; }
     }
 }

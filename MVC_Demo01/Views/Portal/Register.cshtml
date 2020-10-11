@@ -1,0 +1,100 @@
+﻿@model Job_Demo.ViewModel.MemberRegisterView
+
+@{
+    ViewBag.Title = "Register";
+}
+
+<h2>Register</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>MemberRegisterView</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <table>
+            <tr>
+                <td>
+                    @Html.LabelFor(model => model.NewMember.Identity)
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.NewMember.Identity)
+                    @Html.ValidationMessageFor(model => model.NewMember.Identity)
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.LabelFor(model => model.NewMember.UserName)
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.NewMember.UserName)
+                    @Html.ValidationMessageFor(model => model.NewMember.UserName)
+                </td>
+                <td>
+                    @ViewData["NameError"]
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.LabelFor(model => model.NewMember.Email)
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.NewMember.Email)
+                    @Html.ValidationMessageFor(model => model.NewMember.Email)
+                </td>
+                <td>
+                    @ViewData["EmailError"]
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.LabelFor(model => model.NewMember.Password)
+                </td>
+                <td>
+                    @Html.PasswordFor(model => model.NewMember.Password)
+                    @Html.ValidationMessageFor(model => model.NewMember.Password)
+                </td>
+                @*<td>
+                    @ViewData["PasswordError"]
+                </td>*@
+            </tr>
+            <tr>
+                <td>
+                    @Html.LabelFor(model => model.PasswordCheck)
+                </td>
+                <td>
+                    @Html.PasswordFor(model => model.PasswordCheck)
+                    @Html.ValidationMessageFor(model => model.PasswordCheck)
+                </td>
+            </tr>
+            @*<tr>
+                    <td>
+                        @Html.LabelFor(model => model.NewMember.AuthCode)
+                    </td>
+                    <td>
+                        @Html.TextBoxFor(model => model.NewMember.AuthCode)
+                        @Html.ValidationMessageFor(model => model.NewMember.AuthCode)
+                    </td>
+                    <td>
+                        @ViewData["AuthCodeError"]
+                    </td>
+                </tr>*@
+            <tr>
+                <td colspan="2">
+                    <input type="submit" value="註冊" />
+                </td>
+            </tr>
+        </table>
+        @*<div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="註冊" class="btn btn-default" />
+                </div>
+            </div>*@
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
