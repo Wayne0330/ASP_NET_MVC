@@ -12,19 +12,14 @@ namespace Job_Demo.ViewModel
     {
         public Account NewMember { get; set; }
 
-
-
-        [DisplayName("密碼111111")]
-       // [Required(ErrorMessage = "請輸入密碼")]
+        [DisplayName("密碼")]
+        [Required(ErrorMessage = "請輸入密碼")]
         public string Password { get; set; }
 
 
         [DisplayName("確認密碼")]
-        //[Compare("Password", ErrorMessage = "兩次密碼不一致")]
+        [Compare("Password", ErrorMessage = "兩次密碼不一致")]
         [Required(ErrorMessage = "請輸入確認密碼")]
         public string PasswordCheck { get; set; }
-
-
-
     }
 }

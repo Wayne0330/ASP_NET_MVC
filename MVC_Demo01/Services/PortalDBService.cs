@@ -11,7 +11,7 @@ using System.Web.ModelBinding;
 
 namespace Job_Demo.Services
 {
-    public class ProtalDBService
+    public class PortalDBService
     {
         public Job_DemoDBEntities db = new Job_DemoDBEntities();
 
@@ -20,14 +20,10 @@ namespace Job_Demo.Services
         }
 
         public void Register(Account NewMember){
-            //Account AccountData = new Account();
-            //AccountData.UserName = Username;
-            //AccountData.Password = Password;
-            //AccountData.Email = Email;
-            //AccountData.Identity = Identity;
-            //NewMember.Password = HashPassword(NewMember.Password);
-            //NewMember.Time = DateTime.Now;
+
+            string str2 = NewMember.Password;
             NewMember.Password = HashPassword(NewMember.Password);
+            string str = NewMember.Password;
             db.Account.Add(NewMember);
             db.SaveChanges();
         }
@@ -36,6 +32,7 @@ namespace Job_Demo.Services
         //Hash密碼
         public string HashPassword(string Password) {
             string saltkey = "adfads2e13DCSDF213";
+           // string hashpwd = Password.Trim();
             string saltAndPassword = String.Concat(Password, saltkey);
             SHA1CryptoServiceProvider sha1Hasher = new SHA1CryptoServiceProvider();
             byte[] PasswordData = Encoding.Default.GetBytes(saltAndPassword);
@@ -52,12 +49,57 @@ namespace Job_Demo.Services
 
 
 
-        public void AccountLogin(string Password, string Email)
+        public string AccountLogin(string Email, string Password)
         {
-            Account AccountData = new Account();
-            AccountData.Password = Password;
-            AccountData.Email = Email;
+            Account LoginAccount = db.Account.Find(Email);
+            if (LoginAccount != null)
+            {
+                ////清除信箱驗證碼
+                //if (String.IsNullOrWhiteSpace(LoginAccount.AuthCode))
+                //{
+                    if (PasswordCheck(LoginAccount, Password)==LoginAccount.Password)
+                    {
+                        return "";
+                    }
+                    else
+                    {
+                        return PasswordCheck(LoginAccount, Password) ;
+                    }
+                //}
+                //else
+                //{
+                //    return "Email未認證";
+                //}
+            }
+            else
+            {
+                return "無此會員";
+            }
         }
+
+        #region 密碼確認
+        //密碼確認
+        public string PasswordCheck(Account CheckMember, string Password)
+        {
+            string result = HashPassword(Password);
+
+            return result;
+        }
+        #endregion
+
+        #region 取得角色
+        public string GetRole(string UserName)
+        {
+            //角色
+            string Role = String.Empty;
+            Account LoginMember = db.Account.Find(UserName);
+            if (LoginMember.Identity != null)
+            {
+                Role = LoginMember.Identity;
+            }
+            return Role;
+        }
+        #endregion
 
         //確認註冊的信箱是否有註冊過
         public bool EmailCheck(string Email)
@@ -66,7 +108,6 @@ namespace Job_Demo.Services
             bool result = (serch == null);
             return result;
         }
-
         //信箱驗證
         #region 信箱驗證
         public string EmailValidate(string Id, string UserName, string AuthCode)
