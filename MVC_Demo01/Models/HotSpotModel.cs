@@ -7,6 +7,8 @@ using System.Web;
 
 namespace Job_Demo.Models
 {
+
+
     public class HotSpotModel
     {
 
