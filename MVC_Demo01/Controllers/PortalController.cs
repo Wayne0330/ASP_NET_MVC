@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
 using Job_Demo.Services;
 using Job_Demo.ViewModel;
 
@@ -9,7 +11,7 @@ namespace Job_Demo.Controllers
     public class PortalController : Controller
     {
         private MailService mailService = new MailService();
-        private ProtalDBService protalDBService = new ProtalDBService();
+        private PortalDBService portalDBService = new PortalDBService();
         // GET: Portal
         public ActionResult Index()
         {
@@ -21,51 +23,51 @@ namespace Job_Demo.Controllers
             return View();
         }
 
-        public ActionResult Create()
-        {
-            if (User.Identity.IsAuthenticated)
-                return RedirectToAction("Index", "Protal");
+        //public ActionResult Create()
+        //{
+        //    if (User.Identity.IsAuthenticated)
+        //        return RedirectToAction("Index", "Protal");
 
-            return View();
-        }
+        //    return View();
+        //}
 
-        [HttpPost]
-        public ActionResult Create(MemberRegisterView RegisterMember)
-        {
-            var isSuccess = true;
-            var returnData = new
-            {
-                // 成功與否
-                IsSuccess = isSuccess,
-                // ModelState錯誤訊息
-                ModelStateErrors = ModelState.Where(x => x.Value.Errors.Count > 0)
-                .ToDictionary(k => k.Key, k => k.Value.Errors.Select(e => e.ErrorMessage).ToArray())
-            };
-            if (ModelState.IsValid)
-            {
-                protalDBService.Register(RegisterMember.NewMember);
-                return RedirectToAction("Success");
-            }
-            else
-            {
-                isSuccess = false;
-                returnData = new
-                {
-                    // 成功與否
-                    IsSuccess = isSuccess,
-                    // ModelState錯誤訊息
-                    ModelStateErrors = ModelState.Where(x => x.Value.Errors.Count > 0)
-                    .ToDictionary(k => k.Key, k => k.Value.Errors.Select(e => e.ErrorMessage).ToArray())
-                };
-                //return View(Newtonsoft.Json.JsonConvert.SerializeObject(returnData), "application/json");
+        //[HttpPost]
+        //public ActionResult Create(MemberRegisterView RegisterMember)
+        //{
+        //    var isSuccess = true;
+        //    var returnData = new
+        //    {
+        //        // 成功與否
+        //        IsSuccess = isSuccess,
+        //        // ModelState錯誤訊息
+        //        ModelStateErrors = ModelState.Where(x => x.Value.Errors.Count > 0)
+        //        .ToDictionary(k => k.Key, k => k.Value.Errors.Select(e => e.ErrorMessage).ToArray())
+        //    };
+        //    if (ModelState.IsValid)
+        //    {
+        //        portalDBService.Register(RegisterMember.NewMember);
+        //        return RedirectToAction("Success");
+        //    }
+        //    else
+        //    {
+        //        isSuccess = false;
+        //        returnData = new
+        //        {
+        //            // 成功與否
+        //            IsSuccess = isSuccess,
+        //            // ModelState錯誤訊息
+        //            ModelStateErrors = ModelState.Where(x => x.Value.Errors.Count > 0)
+        //            .ToDictionary(k => k.Key, k => k.Value.Errors.Select(e => e.ErrorMessage).ToArray())
+        //        };
+        //        //return View(Newtonsoft.Json.JsonConvert.SerializeObject(returnData), "application/json");
 
-                return Content(Newtonsoft.Json.JsonConvert.SerializeObject(returnData), "application/json");
-            }
+        //        return Content(Newtonsoft.Json.JsonConvert.SerializeObject(returnData), "application/json");
+        //    }
 
-            //AccountRegisterView data2 = new AccountRegisterView();
-            //data.DBCreate(UserName, Identity, Password, Email);
+        //    //AccountRegisterView data2 = new AccountRegisterView();
+        //    //data.DBCreate(UserName, Identity, Password, Email);
 
-        }
+        //}
         public ActionResult Register()
         {
             if (User.Identity.IsAuthenticated)
@@ -83,17 +85,54 @@ namespace Job_Demo.Controllers
         //}
         public ActionResult Login()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Success","Portal");
+            }
             return View();
         }
 
-        //[HttpPost]
-        //public ActionResult Login(string Password, string Email)
-        //{
-        //    data.AccountLogin(Password, Email);
-        //    return RedirectToAction("Index");
-        //}
 
+        #region 登入
+        [HttpPost]
+        public ActionResult Login(MemberLoginView LoginMember)
+        {
+            string ValidateStr =
+                portalDBService.AccountLogin(LoginMember.UserName, LoginMember.Password);
 
+            if (String.IsNullOrEmpty(ValidateStr))
+            {
+                string RoleData = portalDBService.GetRole(LoginMember.UserName);
+                FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(1
+                    , LoginMember.UserName
+                    , DateTime.Now                           //開始時間
+                    , DateTime.Now.AddMinutes(30)            //三十分到期
+                    , false                                  //是否cookie存取
+                    , RoleData                               //使用者資料
+                    , FormsAuthentication.FormsCookiePath);  //設定儲存路徑
+                                                             //資料加密
+                string enTicket = FormsAuthentication.Encrypt(ticket);
+                Response.Cookies.Add(new HttpCookie(FormsAuthentication.FormsCookieName, enTicket));
+
+                return RedirectToAction("Index", "HotSpot");
+            }
+            else
+            {
+                ModelState.AddModelError("", ValidateStr);
+                return View(LoginMember);
+            }
+        }
+
+        #endregion
+
+        #region 登出
+        [Authorize]
+        public ActionResult Logout() {
+            FormsAuthentication.SignOut();
+            return RedirectToAction("Login");
+        }
+
+        #endregion
         [HttpPost]
         public ActionResult Register(MemberRegisterView RegisterMember)
         {
@@ -115,7 +154,7 @@ namespace Job_Demo.Controllers
                 //信箱驗證碼填入
                 RegisterMember.NewMember.AuthCode = AuthCode;
                 //呼叫service註冊新會員
-                protalDBService.Register(RegisterMember.NewMember);
+                portalDBService.Register(RegisterMember.NewMember);
                 //取得驗證信範本
                 string TempMail = System.IO.File.ReadAllText(
                     Server.MapPath("~/Views/Shared/RegisterEmailTemplate.html"));
@@ -136,24 +175,24 @@ namespace Job_Demo.Controllers
                 return RedirectToAction("RegisterResult");
 
             }
-            else {
+            //else {
 
-                isSuccess = false;
-                returnData = new
-                {
-                    // 成功與否
-                    IsSuccess = isSuccess,
-                    // ModelState錯誤訊息
-                    ModelStateErrors = ModelState.Where(x => x.Value.Errors.Count > 0)
-                    .ToDictionary(k => k.Key, k => k.Value.Errors.Select(e => e.ErrorMessage).ToArray())
-                };
-                //return View(Newtonsoft.Json.JsonConvert.SerializeObject(returnData), "application/json");
+            //    isSuccess = false;
+            //    returnData = new
+            //    {
+            //        // 成功與否
+            //        IsSuccess = isSuccess,
+            //        // ModelState錯誤訊息
+            //        ModelStateErrors = ModelState.Where(x => x.Value.Errors.Count > 0)
+            //        .ToDictionary(k => k.Key, k => k.Value.Errors.Select(e => e.ErrorMessage).ToArray())
+            //    };
+            //    //return View(Newtonsoft.Json.JsonConvert.SerializeObject(returnData), "application/json");
 
-                return Content(Newtonsoft.Json.JsonConvert.SerializeObject(returnData), "application/json");
-            }
-            //RegisterMember.Password = null;
-            //RegisterMember.PasswordCheck = null;
-            //return View(RegisterMember);
+            //    return Content(Newtonsoft.Json.JsonConvert.SerializeObject(returnData), "application/json");
+            //}
+            RegisterMember.Password = null;
+            RegisterMember.PasswordCheck = null;
+            return View(RegisterMember);
         }
 
         public ActionResult RegisterResult()
@@ -165,14 +204,14 @@ namespace Job_Demo.Controllers
         //確認帳號是否註冊過
         public JsonResult AccountCheck(MemberRegisterView RegisterMember)
         {
-            return Json(protalDBService.EmailCheck(RegisterMember.NewMember.Email),
+            return Json(portalDBService.EmailCheck(RegisterMember.NewMember.Email),
                 JsonRequestBehavior.AllowGet);
         }
 
         //接收驗證信連結結果
         public ActionResult EmailValidate(string Id, string Username, string AuthCode)
         {
-            ViewData["EmailValidate"] = protalDBService.EmailValidate(Id, Username, AuthCode);
+            ViewData["EmailValidate"] = portalDBService.EmailValidate(Id, Username, AuthCode);
             return View();
         }
 

@@ -1,97 +1,67 @@
-﻿@model IEnumerable<Job_Demo.Models.HotSpotModel>
+﻿@*@model IEnumerable<Job_Demo.Models.HotSpotModel>*@
 @{
     ViewBag.Title = "Index";
 }
 
 <h2>新北市熱點</h2>
 @ViewBag.Result
-@*<table class="table">
+
+@{
+    var list = ViewBag.List;
+}
+
+<table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.id)
+            熱點代碼
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.spot_name)
+            熱點名稱
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.type)
+            熱點類別
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.company)
+            業者
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.district)
+            鄉鎮市區
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.address)
+            地址
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.apparatus_name)
+            機關構名稱
         </th>
-        <th>
-            @Html.DisplayNameFor(model => model.latitude)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.longitude)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.twd97X)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.twd97Y)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.wgs84aX)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.wgs84aY)
-        </th>
+
     </tr>
 
     @foreach (var item in Model)
     {
-<tr>
-    <td>
-        @Html.DisplayFor(modelItem => item.id)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.spot_name)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.type)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.company)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.district)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.address)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.apparatus_name)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.latitude)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.longitude)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.twd97X)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.twd97Y)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.wgs84aX)
-    </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.wgs84aY)
-    </td>
-</tr>
+        <tr>
+            <td>
+                @item.id
+            </td>
+            <td>
+                @item.spot_name
+            </td>
+            <td>
+                @item.type
+            </td>
+            <td>
+                @item.company
+            </td>
+            <td>
+                @item.district
+            </td>
+            <td>
+                @item.address
+            </td>
+            <td>
+                @item.apparatus_name
+            </td>
+        </tr>
     }
 
-</table>*@
+</table>
 
