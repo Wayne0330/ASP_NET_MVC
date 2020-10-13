@@ -3,6 +3,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
+using System.Web.UI;
+using Job_Demo.Models;
 using Job_Demo.Services;
 using Job_Demo.ViewModel;
 
@@ -87,7 +89,7 @@ namespace Job_Demo.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Success","Portal");
+                return RedirectToAction("Success", "Portal");
             }
             return View();
         }
@@ -98,13 +100,13 @@ namespace Job_Demo.Controllers
         public ActionResult Login(MemberLoginView LoginMember)
         {
             string ValidateStr =
-                portalDBService.AccountLogin(LoginMember.UserName, LoginMember.Password);
+                portalDBService.AccountLogin(LoginMember.Email, LoginMember.Password);
 
             if (String.IsNullOrEmpty(ValidateStr))
             {
-                string RoleData = portalDBService.GetRole(LoginMember.UserName);
+                string RoleData = portalDBService.GetRole(LoginMember.Email);
                 FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(1
-                    , LoginMember.UserName
+                    , LoginMember.Email
                     , DateTime.Now                           //開始時間
                     , DateTime.Now.AddMinutes(30)            //三十分到期
                     , false                                  //是否cookie存取
@@ -113,7 +115,6 @@ namespace Job_Demo.Controllers
                                                              //資料加密
                 string enTicket = FormsAuthentication.Encrypt(ticket);
                 Response.Cookies.Add(new HttpCookie(FormsAuthentication.FormsCookieName, enTicket));
-
                 return RedirectToAction("Index", "HotSpot");
             }
             else
@@ -127,7 +128,8 @@ namespace Job_Demo.Controllers
 
         #region 登出
         [Authorize]
-        public ActionResult Logout() {
+        public ActionResult Logout()
+        {
             FormsAuthentication.SignOut();
             return RedirectToAction("Login");
         }
@@ -215,5 +217,47 @@ namespace Job_Demo.Controllers
             return View();
         }
 
+
+
+        //[Authorize]
+        //public ActionResult ChangePassword()
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        Response.Write("1");
+        //        return View();
+
+        //    }
+        //    Response.Write("2");
+        //    return View();
+
+        //}
+        //#region 修改密碼
+        ////修改密碼資料
+        ////[Authorize]
+        //[HttpPost]
+        //public ActionResult ChangePaasword(ChangePasswordView ChangeData)
+        //{
+        //    string state = ChangeData.Password;
+        //    if (ModelState.IsValid)
+        //    {
+        //        ViewData["ChangeState"] = portalDBService.ChangePassword(User.Identity.Name, ChangeData.Password, ChangeData.NewPassword);
+        //    }
+        //    return View(state);
+        //}
+        //#endregion
+
+        public ActionResult ChangePassword() {
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult ChangePassword(ChangePasswordView data) {
+            var cookies = Request.Cookies[FormsAuthentication.FormsCookieName];
+            var tickets = FormsAuthentication.Decrypt(cookies.Value);
+            string role = tickets.UserData;
+            ViewData["ChangeState"] = portalDBService.ChangePassword(role, data.Password, data.NewPassword);
+            return View();
+        }
     }
 }
