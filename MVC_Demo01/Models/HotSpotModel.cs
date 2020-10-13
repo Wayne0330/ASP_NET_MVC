@@ -52,6 +52,7 @@ namespace Job_Demo.Models
         [Display(Name = "wgs84a經度")]
         public string wgs84aY { get; set; }
 
+        public List<string> spots = new List<string>();
 
     }
 }

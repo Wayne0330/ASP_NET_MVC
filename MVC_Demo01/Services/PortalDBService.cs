@@ -15,11 +15,13 @@ namespace Job_Demo.Services
     {
         public Job_DemoDBEntities db = new Job_DemoDBEntities();
 
-        public List<Account> GetAccount() {
+        public List<Account> GetAccount()
+        {
             return (db.Account.ToList());
         }
 
-        public void Register(Account NewMember){
+        public void Register(Account NewMember)
+        {
 
             string str2 = NewMember.Password;
             NewMember.Password = HashPassword(NewMember.Password);
@@ -30,9 +32,10 @@ namespace Job_Demo.Services
 
 
         //Hash密碼
-        public string HashPassword(string Password) {
+        public string HashPassword(string Password)
+        {
             string saltkey = "adfads2e13DCSDF213";
-           // string hashpwd = Password.Trim();
+            // string hashpwd = Password.Trim();
             string saltAndPassword = String.Concat(Password, saltkey);
             SHA1CryptoServiceProvider sha1Hasher = new SHA1CryptoServiceProvider();
             byte[] PasswordData = Encoding.Default.GetBytes(saltAndPassword);
@@ -57,14 +60,14 @@ namespace Job_Demo.Services
                 ////清除信箱驗證碼
                 //if (String.IsNullOrWhiteSpace(LoginAccount.AuthCode))
                 //{
-                    if (PasswordCheck(LoginAccount, Password)==LoginAccount.Password)
-                    {
-                        return "";
-                    }
-                    else
-                    {
-                        return PasswordCheck(LoginAccount, Password) ;
-                    }
+                if (PasswordCheck(LoginAccount, Password))
+                {
+                    return "";
+                }
+                else
+                {
+                    return "輸入密碼錯誤";
+                }
                 //}
                 //else
                 //{
@@ -79,23 +82,23 @@ namespace Job_Demo.Services
 
         #region 密碼確認
         //密碼確認
-        public string PasswordCheck(Account CheckMember, string Password)
+        public bool PasswordCheck(Account CheckMember, string Password)
         {
-            string result = HashPassword(Password);
+            bool result = CheckMember.Password.Equals(HashPassword(Password));
 
             return result;
         }
         #endregion
 
         #region 取得角色
-        public string GetRole(string UserName)
+        public string GetRole(string Email)
         {
             //角色
             string Role = String.Empty;
-            Account LoginMember = db.Account.Find(UserName);
-            if (LoginMember.Identity != null)
+            Account LoginMember = db.Account.Find(Email);
+            if (LoginMember.Email != null)
             {
-                Role = LoginMember.Identity;
+                Role = LoginMember.Email;
             }
             return Role;
         }
@@ -123,7 +126,7 @@ namespace Job_Demo.Services
                     db.SaveChanges();
                     ValidateStr = "信箱驗證成功";
                 }
-                else 
+                else
                 {
                     ValidateStr = "驗證碼錯誤，請重新確認在註冊";
                 }
@@ -131,5 +134,23 @@ namespace Job_Demo.Services
             return ValidateStr;
         }
         #endregion
+
+
+        public string ChangePassword(string Email, string Password, string newPassword)
+        {
+            //取得資料
+            Account LoginMember = db.Account.Find(Email);
+            //確認舊密碼是否正確
+            if (PasswordCheck(LoginMember, Password))
+            {
+                LoginMember.Password = HashPassword(newPassword);
+                db.SaveChanges();
+                return "密碼修改成功";
+            }
+            else
+            {
+                return "舊密碼輸入錯誤";
+            }
+        }
     }
 }

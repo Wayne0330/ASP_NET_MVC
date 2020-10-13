@@ -3,12 +3,12 @@
     ViewBag.Title = "Index";
 }
 
-<h2>新北市熱點</h2>
-@ViewBag.Result
+<div>
+    @Html.ActionLink("會員中心", "Index", "MyAccount")
+</div>
 
-@{
-    var list = ViewBag.List;
-}
+<h2>新北市熱點</h2>
+
 
 <table class="table">
     <tr>

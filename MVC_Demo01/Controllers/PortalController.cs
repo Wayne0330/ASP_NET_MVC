@@ -25,71 +25,18 @@ namespace Job_Demo.Controllers
             return View();
         }
 
-        //public ActionResult Create()
-        //{
-        //    if (User.Identity.IsAuthenticated)
-        //        return RedirectToAction("Index", "Protal");
 
-        //    return View();
-        //}
-
-        //[HttpPost]
-        //public ActionResult Create(MemberRegisterView RegisterMember)
-        //{
-        //    var isSuccess = true;
-        //    var returnData = new
-        //    {
-        //        // 成功與否
-        //        IsSuccess = isSuccess,
-        //        // ModelState錯誤訊息
-        //        ModelStateErrors = ModelState.Where(x => x.Value.Errors.Count > 0)
-        //        .ToDictionary(k => k.Key, k => k.Value.Errors.Select(e => e.ErrorMessage).ToArray())
-        //    };
-        //    if (ModelState.IsValid)
-        //    {
-        //        portalDBService.Register(RegisterMember.NewMember);
-        //        return RedirectToAction("Success");
-        //    }
-        //    else
-        //    {
-        //        isSuccess = false;
-        //        returnData = new
-        //        {
-        //            // 成功與否
-        //            IsSuccess = isSuccess,
-        //            // ModelState錯誤訊息
-        //            ModelStateErrors = ModelState.Where(x => x.Value.Errors.Count > 0)
-        //            .ToDictionary(k => k.Key, k => k.Value.Errors.Select(e => e.ErrorMessage).ToArray())
-        //        };
-        //        //return View(Newtonsoft.Json.JsonConvert.SerializeObject(returnData), "application/json");
-
-        //        return Content(Newtonsoft.Json.JsonConvert.SerializeObject(returnData), "application/json");
-        //    }
-
-        //    //AccountRegisterView data2 = new AccountRegisterView();
-        //    //data.DBCreate(UserName, Identity, Password, Email);
-
-        //}
         public ActionResult Register()
         {
-            if (User.Identity.IsAuthenticated)
-                return RedirectToAction("Index", "Protal");
-
             return View();
         }
 
-        //[HttpPost]
-        //public ActionResult Register(MemberRegisterView memberRegister)
-        //{
 
-        //    protalDBService.Register(memberRegister.NewMember);
-        //    return View(memberRegister);
-        //}
         public ActionResult Login()
         {
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Success", "Portal");
+                return RedirectToAction("Index", "HotSpot");
             }
             return View();
         }
@@ -177,21 +124,7 @@ namespace Job_Demo.Controllers
                 return RedirectToAction("RegisterResult");
 
             }
-            //else {
 
-            //    isSuccess = false;
-            //    returnData = new
-            //    {
-            //        // 成功與否
-            //        IsSuccess = isSuccess,
-            //        // ModelState錯誤訊息
-            //        ModelStateErrors = ModelState.Where(x => x.Value.Errors.Count > 0)
-            //        .ToDictionary(k => k.Key, k => k.Value.Errors.Select(e => e.ErrorMessage).ToArray())
-            //    };
-            //    //return View(Newtonsoft.Json.JsonConvert.SerializeObject(returnData), "application/json");
-
-            //    return Content(Newtonsoft.Json.JsonConvert.SerializeObject(returnData), "application/json");
-            //}
             RegisterMember.Password = null;
             RegisterMember.PasswordCheck = null;
             return View(RegisterMember);
@@ -219,45 +152,21 @@ namespace Job_Demo.Controllers
 
 
 
-        //[Authorize]
-        //public ActionResult ChangePassword()
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        Response.Write("1");
-        //        return View();
 
-        //    }
-        //    Response.Write("2");
-        //    return View();
 
-        //}
-        //#region 修改密碼
-        ////修改密碼資料
-        ////[Authorize]
-        //[HttpPost]
-        //public ActionResult ChangePaasword(ChangePasswordView ChangeData)
-        //{
-        //    string state = ChangeData.Password;
-        //    if (ModelState.IsValid)
-        //    {
-        //        ViewData["ChangeState"] = portalDBService.ChangePassword(User.Identity.Name, ChangeData.Password, ChangeData.NewPassword);
-        //    }
-        //    return View(state);
-        //}
-        //#endregion
-
-        public ActionResult ChangePassword() {
+        public ActionResult ChangePassword()
+        {
             return View();
         }
 
         [HttpPost]
-        public ActionResult ChangePassword(ChangePasswordView data) {
+        public ActionResult ChangePassword(ChangePasswordView data)
+        {
             var cookies = Request.Cookies[FormsAuthentication.FormsCookieName];
             var tickets = FormsAuthentication.Decrypt(cookies.Value);
             string role = tickets.UserData;
-            ViewData["ChangeState"] = portalDBService.ChangePassword(role, data.Password, data.NewPassword);
-            return View();
+            TempData["UpdateDataResult"] = portalDBService.ChangePassword(role, data.Password, data.NewPassword);
+            return RedirectToAction("UpdateMemberDataResult","MyAccount");
         }
     }
 }

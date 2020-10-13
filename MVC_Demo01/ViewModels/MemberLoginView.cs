@@ -11,7 +11,7 @@ namespace Job_Demo.ViewModel
     {
         [DisplayName("信箱")]
         [Required(ErrorMessage = "請輸入信箱")]
-        public string UserName { get; set; }
+        public string Email { get; set; }
 
         [DisplayName("密碼")]
         [Required(ErrorMessage = "請輸入密碼")]
